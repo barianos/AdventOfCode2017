@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security;
 
 namespace AdventOfCode
 {
@@ -6,6 +7,7 @@ namespace AdventOfCode
     {
         private int rowSize;
         private int colSize;
+        private int[] num;
 
         private String input = "3458	3471	163	1299	170	4200	2425	167	3636	4001	4162	115	2859	130	4075	4269"
                                + "    2777	2712	120	2569	2530	3035	1818	32	491	872	113	92	2526	477	138	1360"
@@ -24,47 +26,77 @@ namespace AdventOfCode
                                + "    3178	219	253	1297	3661	1552	8248	678	245	7042	260	581	7350	431	8281	8117"
                                + "    837	80	95	281	652	822	1028	1295	101	1140	88	452	85	444	649	1247";
 
+
         public DayTwo(int rowSize, int colSize)
         {
             this.rowSize = rowSize;
             this.colSize = colSize;
-            int solution = SolvePuzzle();
-            Console.Write("Day Two: Solution is: " + solution);
+            StringToIntArray();
+            int solution = SolvePartOne();
+            Console.Write("Day Two part 1: Solution is: " + solution + "\n");
+            int part2 = SolvePartTwo();
+            Console.Write("Day Two part 2: Solution is: " + part2 + "\n");
         }
 
 
-        private int SolvePuzzle()
+        private int SolvePartOne()
         {
-            int[] num = StringToIntArray();
             int sum = 0;
             for (int i = 0; i < colSize; i++)
             {
                 sum += RowDifference(num, i);
             }
-                
-
-
             return sum;
         }
 
-        
-        private int[] StringToIntArray()
+        private int SolvePartTwo()
+        {
+            int sum = 0;
+            for (int i = 0; i < colSize; i++)
+            {
+                sum += AkeraiaDieresi(num, i);
+            }
+            return sum;
+        }
+
+
+        private int AkeraiaDieresi(int[] num, int col)
+        {
+            for (int i = col * rowSize; i < (col * rowSize + rowSize) - 1; i++)
+            {
+                for (int j = col * rowSize + 1; j < (col * rowSize + rowSize); j++)
+                {
+                    if ((double) num[i] % num[j] == 0 && num[i] > num[j]) // && num[i]!= num[j])
+                    {
+                        return num[i] / num[j];
+                    }
+                    else if ((double) num[j] % num[i] == 0 && num[j] > num[i])
+                    {
+                        return num[j] / num[i];
+                    }
+                }
+            }
+            return 0;
+        }
+
+
+        private void StringToIntArray()
         {
             String[] mid = input.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries);
-            int[] num = new int[mid.Length];
+            num = new int[mid.Length];
             for (int i = 0; i < num.Length; i++)
             {
                 num[i] = int.Parse(mid[i]);
             }
-            return num;
         }
 
-        private int RowDifference (int[] num, int col)
+
+        private int RowDifference(int[] num, int col)
         {
             int min = 99999;
             int max = -1;
-                
-            for (int i = col *rowSize; i < (col *rowSize +rowSize); i++)
+
+            for (int i = col * rowSize; i < (col * rowSize + rowSize); i++)
             {
                 if (num[i] > max)
                 {
@@ -74,10 +106,8 @@ namespace AdventOfCode
                 {
                     min = num[i];
                 }
-                
             }
-            return max -min;
+            return max - min;
         }
-        
     }
 }
